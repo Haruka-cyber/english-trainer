@@ -950,6 +950,7 @@ function renderList() {
           <div class="script-item-body">
             <div class="script-en">${esc(s.en)}</div>
             <div class="script-ja">${esc(s.ja||'─')}</div>
+            ${s.tag ? `<div style="margin-top:4px"><span class="tag-badge">${esc(s.tag)}</span></div>` : ''}
           </div>
           <div class="item-actions">
             <button class="icon-btn" onclick="openModal(${i})">編</button>
