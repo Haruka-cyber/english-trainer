@@ -969,6 +969,7 @@ function openModal(idx=null) {
   document.getElementById('modal-title').textContent = idx===null ? 'スクリプトを追加' : 'スクリプトを編集';
   document.getElementById('input-en').value = idx!==null ? scripts[idx].en : '';
   document.getElementById('input-ja').value = idx!==null ? scripts[idx].ja : '';
+  populateTagSelect(idx !== null ? scripts[idx].tag : '');
   document.getElementById('modal').classList.add('open');
   setTimeout(() => document.getElementById('input-en').focus(), 100);
 }
