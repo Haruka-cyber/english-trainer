@@ -677,6 +677,15 @@
       <label>日本語訳</label>
       <textarea id="input-ja" rows="2" placeholder="e.g. 今日はいかがお過ごしですか？"></textarea>
     </div>
+    <div class="form-group">
+      <label>タグ</label>
+      <div class="tag-row">
+        <select id="input-tag-select" onchange="onTagSelectChange()">
+          <option value="">タグなし</option>
+        </select>
+        <input id="input-tag-custom" type="text" placeholder="新しいタグ名" style="display:none">
+      </div>
+    </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
       <button class="btn-save" onclick="saveScript()">保存</button>
