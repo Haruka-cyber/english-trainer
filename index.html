@@ -893,21 +893,21 @@ function setSyncStatus(msg, color) {
 async function manualSync() {
   const btn = document.getElementById('sync-btn');
   btn.disabled = true;
-  // まずローカルのスコアをクラウドへ送信
+
+  // スコアをURLパラメータでGETとして送信（CORS回避）
   setSyncStatus('送信中...', 'rgba(255,255,255,.6)');
   try {
     const payload = {};
     scripts.forEach(s => { payload[s.en] = s.score; });
-    await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
-  } catch(e) {
-    setSyncStatus('失敗', '#f87171');
-    btn.disabled = false;
-    return;
-  }
-  // 次にクラウドから最新データを取得してマージ
+    const encoded = encodeURIComponent(JSON.stringify(payload));
+    await fetch(`${GAS_URL}?action=save&data=${encoded}`, { mode: 'no-cors' });
+  } catch(e) { /* no-corsでは常にエラーにならない */ }
+
+  // 少し待ってからクラウドの最新データを取得
   setSyncStatus('受信中...', 'rgba(255,255,255,.6)');
+  await new Promise(r => setTimeout(r, 3000));
   try {
-    const res = await fetch(GAS_URL);
+    const res = await fetch(`${GAS_URL}?action=load`);
     const data = await res.json();
     scripts.forEach(s => {
       if (data[s.en]) s.score = { ok:0, so:0, ng:0, lastReviewed:null, interval:24, ...data[s.en] };
