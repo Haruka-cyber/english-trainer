@@ -756,12 +756,58 @@ DEFAULT_SCRIPTS.forEach(s => {
 });
 persist();
 
+// 既存スクリプトにタグがなければ補完
+scripts = scripts.map(s => ({ ...s, tag: s.tag || 'Web会議' }));
+persist();
+
 let settings = JSON.parse(localStorage.getItem('eng_settings') || '{"rate":1,"pitch":1,"voiceURI":""}');
 let mode = 'seq';
 let playOrder = [];
 let currentPos = 0;
 let listFilter_current = 'all';
+let practiceTag = 'すべて';
+let listTag = 'すべて';
 let editingIdx = null;
+
+function getAllTags() {
+  const tags = new Set(scripts.map(s => s.tag).filter(Boolean));
+  return ['すべて', ...Array.from(tags).sort()];
+}
+
+function renderTagBar(containerId, currentTag, onSelect) {
+  const bar = document.getElementById(containerId);
+  bar.innerHTML = getAllTags().map(t => `
+    <button class="tag-chip ${t === currentTag ? 'active' : ''}" onclick="(${onSelect.toString()})('${t}')">${t}</button>
+  `).join('');
+}
+
+function setPracticeTag(tag) {
+  practiceTag = tag;
+  renderTagBar('practice-tag-bar', practiceTag, setPracticeTag);
+  buildPlayOrder();
+  renderCard();
+}
+
+function setListTag(tag) {
+  listTag = tag;
+  renderTagBar('list-tag-bar', listTag, setListTag);
+  renderList();
+}
+
+function onTagSelectChange() {
+  const sel = document.getElementById('input-tag-select');
+  const custom = document.getElementById('input-tag-custom');
+  custom.style.display = sel.value === '__new__' ? 'block' : 'none';
+}
+
+function populateTagSelect(currentTag) {
+  const sel = document.getElementById('input-tag-select');
+  const tags = getAllTags().filter(t => t !== 'すべて');
+  sel.innerHTML = '<option value="">タグなし</option>' +
+    tags.map(t => `<option value="${t}" ${t === currentTag ? 'selected' : ''}>${t}</option>`).join('') +
+    '<option value="__new__">＋ 新しいタグを作成</option>';
+  document.getElementById('input-tag-custom').style.display = 'none';
+}
 
 function diffScore(s) {
   const sc = s.score;
