@@ -779,6 +779,7 @@ function recordFeedback(type) {
   else if (type === 'so') sc.interval = Math.max(sc.interval * 1.2, 12);
   else sc.interval = 1;
   persist();
+  syncToCloud();
   const card = document.getElementById('flip-card');
   card.style.transition = 'opacity .15s';
   card.style.opacity = '0';
