@@ -894,27 +894,36 @@ async function manualSync() {
   const btn = document.getElementById('sync-btn');
   btn.disabled = true;
 
-  // ローカルのスコアをクラウドへ送信
-  setSyncStatus('送信中...', 'rgba(255,255,255,.6)');
+  // 1. クラウドから取得
+  setSyncStatus('取得中...', 'rgba(255,255,255,.6)');
+  let cloudData = {};
   try {
-    const payload = {};
-    scripts.forEach(s => { payload[s.en] = s.score; });
-    await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
+    const res = await fetch(GAS_URL);
+    cloudData = await res.json();
   } catch(e) {
     setSyncStatus('失敗', '#f87171');
     btn.disabled = false;
     return;
   }
 
-  // クラウドから最新データを取得してマージ
-  setSyncStatus('受信中...', 'rgba(255,255,255,.6)');
+  // 2. ローカルとクラウドをマージ（両デバイスの記録を合算）
+  scripts.forEach(s => {
+    const c = cloudData[s.en];
+    if (!c) return;
+    s.score.ok = Math.max(s.score.ok, c.ok||0);
+    s.score.so = Math.max(s.score.so, c.so||0);
+    s.score.ng = Math.max(s.score.ng, c.ng||0);
+    s.score.lastReviewed = Math.max(s.score.lastReviewed||0, c.lastReviewed||0) || null;
+    s.score.interval = Math.max(s.score.interval||24, c.interval||24);
+  });
+  persist();
+
+  // 3. マージ済みデータをクラウドに保存
+  setSyncStatus('保存中...', 'rgba(255,255,255,.6)');
   try {
-    const res = await fetch(GAS_URL);
-    const data = await res.json();
-    scripts.forEach(s => {
-      if (data[s.en]) s.score = { ok:0, so:0, ng:0, lastReviewed:null, interval:24, ...data[s.en] };
-    });
-    persist();
+    const payload = {};
+    scripts.forEach(s => { payload[s.en] = s.score; });
+    await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
     renderCard();
     if (document.getElementById('page-list').classList.contains('active')) renderList();
     setSyncStatus('完了', '#34d399');
