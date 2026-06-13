@@ -471,6 +471,61 @@
   .warn-btn { background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.3); color: var(--yellow); padding: 5px 12px; border-radius: 7px; cursor: pointer; font-size: .75rem; font-weight: 700; letter-spacing: .04em; transition: all .15s; }
   .warn-btn:hover { background: rgba(251,191,36,.22); }
 
+  /* ── タグ ── */
+  .tag-filter-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tag-filter-bar::-webkit-scrollbar { display: none; }
+  .tag-chip {
+    flex-shrink: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .tag-chip.active { border-color: var(--accent); color: var(--accent); background: rgba(129,140,248,.1); }
+  .tag-badge {
+    display: inline-block;
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: rgba(129,140,248,.15);
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  .tag-select-wrap {
+    margin-bottom: 14px;
+  }
+  .tag-select-wrap label { display: block; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .tag-row { display: flex; gap: 6px; }
+  .tag-row input, .tag-row select {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: .88rem;
+    font-family: inherit;
+    color: var(--text);
+    outline: none;
+  }
+  .tag-row input:focus, .tag-row select:focus { border-color: var(--accent); }
+
   @media (max-width: 480px) {
     .card-text { font-size: 1rem; }
     .mode-btn { font-size: .65rem; padding: 7px 2px; }
