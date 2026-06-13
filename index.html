@@ -828,7 +828,9 @@ function dominantResult(s) {
 
 function buildPlayOrder() {
   if (!scripts.length) { playOrder = []; return; }
-  const idx = scripts.map((_, i) => i);
+  const idx = scripts
+    .map((_, i) => i)
+    .filter(i => practiceTag === 'すべて' || scripts[i].tag === practiceTag);
   if (mode === 'seq') {
     playOrder = idx;
   } else if (mode === 'rand') {
