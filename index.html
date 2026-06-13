@@ -926,6 +926,7 @@ function renderList() {
     return;
   }
   const filtered = scripts.map((s, i) => ({ s, i })).filter(({ s }) => {
+    if (listTag !== 'すべて' && s.tag !== listTag) return false;
     if (listFilter_current === 'all')  return true;
     if (listFilter_current === 'none') return dominantResult(s) === 'none';
     return dominantResult(s) === listFilter_current;
