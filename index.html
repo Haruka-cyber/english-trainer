@@ -679,6 +679,14 @@ scripts = scripts.map(s => ({
   ...s,
   score: { ok:0, so:0, ng:0, lastReviewed:null, interval:24, ...(s.score||{}) }
 }));
+// DEFAULT_SCRIPTSに新規追加されたフレーズをマージ
+const existingEn = new Set(scripts.map(s => s.en));
+DEFAULT_SCRIPTS.forEach(s => {
+  if (!existingEn.has(s.en)) {
+    scripts.push({ ...s, score: { ok:0, so:0, ng:0, lastReviewed:null, interval:24 } });
+  }
+});
+persist();
 
 let settings = JSON.parse(localStorage.getItem('eng_settings') || '{"rate":1,"pitch":1,"voiceURI":""}');
 let mode = 'seq';
