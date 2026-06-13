@@ -485,7 +485,8 @@
 
 <header>
   <span class="header-title">English Trainer</span>
-  <span id="sync-status" style="font-size:.68rem;letter-spacing:.06em;color:rgba(255,255,255,.5)"></span>
+  <button onclick="manualSync()" id="sync-btn" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:white;padding:5px 12px;border-radius:7px;font-size:.72rem;font-weight:700;letter-spacing:.06em;cursor:pointer;">同期</button>
+  <span id="sync-status" style="font-size:.68rem;letter-spacing:.05em;color:rgba(255,255,255,.5);min-width:52px;text-align:right;"></span>
   <div class="tab-bar">
     <button class="tab-btn active" onclick="showPage('practice',this)">練習</button>
     <button class="tab-btn" onclick="showPage('list',this)">リスト</button>
