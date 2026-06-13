@@ -1085,6 +1085,7 @@ populateVoices();
 document.getElementById('modal').addEventListener('click', e => { if (e.target===e.currentTarget) closeModal(); });
 
 buildPlayOrder();
+renderTagBar('practice-tag-bar', practiceTag, setPracticeTag);
 renderCard();
 manualSync();
 </script>
