@@ -853,8 +853,8 @@ function showPage(name, btn) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   btn.classList.add('active');
-  if (name === 'practice') renderCard();
-  if (name === 'list') renderList();
+  if (name === 'practice') { renderTagBar('practice-tag-bar', practiceTag, setPracticeTag); renderCard(); }
+  if (name === 'list') { renderTagBar('list-tag-bar', listTag, setListTag); renderList(); }
 }
 
 function setMode(m) {
