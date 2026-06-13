@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Script Trainer</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #0f172a;
+    --surface:  #1e293b;
+    --surface2: #273549;
+    --border:   #334155;
+    --accent:   #818cf8;
+    --accent2:  #6366f1;
+    --text:     #f1f5f9;
+    --sub:      #94a3b8;
+    --muted:    #475569;
+    --green:    #34d399;
+    --yellow:   #fbbf24;
+    --red:      #f87171;
+    --green-bg: rgba(52,211,153,.12);
+    --yellow-bg:rgba(251,191,36,.12);
+    --red-bg:   rgba(248,113,113,.12);
+  }
+
+  body {
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── ヘッダー ── */
+  header {
+    background: rgba(15,23,42,.9);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-title {
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .tab-bar { display: flex; gap: 2px; background: var(--surface); border-radius: 10px; padding: 3px; }
+  .tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--sub);
+    padding: 5px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: .8rem;
+    font-weight: 600;
+    letter-spacing: .03em;
+    transition: all .18s;
+  }
+  .tab-btn.active { background: var(--surface2); color: var(--text); }
+
+  /* ── ページ ── */
+  .page { display: none; padding: 20px 16px; max-width: 680px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* ── モード選択 ── */
+  .mode-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .mode-btn {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 4px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    cursor: pointer;
+    color: var(--muted);
+    text-align: center;
+    transition: all .18s;
+    text-transform: uppercase;
+  }
+  .mode-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(129,140,248,.1);
+  }
+
+  /* ── カウンター・進捗 ── */
+  .card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .card-counter { font-size: .75rem; font-weight: 600; color: var(--muted); letter-spacing: .06em; }
+  .progress-wrap {
+    flex: 1;
+    margin: 0 12px;
+    background: var(--surface2);
+    border-radius: 2px;
+    height: 3px;
+  }
+  .progress-bar {
+    background: var(--accent);
+    height: 100%;
+    border-radius: 2px;
+    transition: width .3s;
+  }
+
+  /* ── カード ── */
+  .flip-card {
+    perspective: 1200px;
+    height: 210px;
+    cursor: pointer;
+    margin-bottom: 18px;
+    user-select: none;
+  }
+  .flip-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform .5s cubic-bezier(.4,0,.2,1);
+  }
+  .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+
+  .flip-front, .flip-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 28px;
+  }
+  .flip-front {
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+  .flip-back {
+    background: linear-gradient(135deg, #312e81 0%, #4c1d95 100%);
+    border: 1px solid rgba(129,140,248,.3);
+    transform: rotateY(180deg);
+  }
+  .card-label {
+    font-size: .65rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 14px;
+    color: var(--muted);
+  }
+  .flip-back .card-label { color: rgba(255,255,255,.4); }
+  .card-text {
+    font-size: 1.15rem;
+    font-weight: 500;
+    text-align: center;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  .flip-back .card-text { color: #fff; }
+  .card-hint {
+    font-size: .68rem;
+    color: var(--muted);
+    margin-top: 16px;
+    letter-spacing: .04em;
+  }
+  .flip-back .card-hint { color: rgba(255,255,255,.3); }
+
+  /* ── ナビ ── */
+  .controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .ctrl-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--sub);
+    transition: all .18s;
+  }
+  .ctrl-btn svg { width: 16px; height: 16px; fill: currentColor; }
+  .ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .ctrl-btn.play {
+    background: var(--accent2);
+    border-color: var(--accent2);
+    color: white;
+    width: 56px;
+    height: 56px;
+  }
+  .ctrl-btn.play svg { width: 20px; height: 20px; }
+  .ctrl-btn.play:hover { background: #4f46e5; border-color: #4f46e5; }
+
+  /* ── フィードバック ── */
+  .fb-label {
+    text-align: center;
+    font-size: .68rem;
+    color: var(--muted);
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .feedback-bar { display: flex; gap: 8px; }
+  .fb-btn {
+    flex: 1;
+    border-radius: 10px;
+    padding: 12px 8px;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: all .18s;
+    color: var(--sub);
+    text-transform: uppercase;
+  }
+  .fb-btn .fb-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .7rem;
+    font-weight: 900;
+  }
+  .fb-btn.ok .fb-icon { background: var(--green-bg); color: var(--green); }
+  .fb-btn.so .fb-icon { background: var(--yellow-bg); color: var(--yellow); }
+  .fb-btn.ng .fb-icon { background: var(--red-bg); color: var(--red); }
+  .fb-btn.ok:hover { border-color: var(--green); color: var(--green); background: var(--green-bg); }
+  .fb-btn.so:hover { border-color: var(--yellow); color: var(--yellow); background: var(--yellow-bg); }
+  .fb-btn.ng:hover { border-color: var(--red); color: var(--red); background: var(--red-bg); }
+
+  /* ── リスト ── */
+  .list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .list-title { font-size: .8rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--sub); }
+  .add-btn {
+    background: var(--accent2);
+    color: white;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    transition: background .18s;
+  }
+  .add-btn:hover { background: #4f46e5; }
+
+  .list-filter {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all .15s;
+  }
+  .filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(129,140,248,.1); }
+
+  .script-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 6px;
+    transition: border-color .15s;
+  }
+  .script-item:hover { border-color: var(--muted); }
+  .script-item-top { display: flex; align-items: flex-start; gap: 10px; }
+
+  /* 苦手度：左ボーダーで表現 */
+  .diff-bar {
+    width: 3px;
+    border-radius: 2px;
+    align-self: stretch;
+    min-height: 36px;
+    flex-shrink: 0;
+  }
+  .diff-bar.hard  { background: var(--red); }
+  .diff-bar.mid   { background: var(--yellow); }
+  .diff-bar.easy  { background: var(--green); }
+  .diff-bar.none  { background: var(--border); }
+
+  .script-item-body { flex: 1; min-width: 0; }
+  .script-en {
+    font-weight: 500;
+    font-size: .88rem;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text);
+  }
+  .script-ja {
+    font-size: .78rem;
+    color: var(--sub);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .icon-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-size: .78rem;
+    font-weight: 700;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .15s;
+  }
+  .icon-btn:hover { border-color: var(--sub); color: var(--text); }
+  .icon-btn.del:hover { border-color: var(--red); color: var(--red); }
+
+  /* スコアバッジ */
+  .score-row { display: flex; gap: 6px; margin-top: 8px; align-items: center; flex-wrap: wrap; }
+  .score-badge {
+    font-size: .68rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+  .score-badge.ok   { background: var(--green-bg);  color: var(--green); }
+  .score-badge.so   { background: var(--yellow-bg); color: var(--yellow); }
+  .score-badge.ng   { background: var(--red-bg);    color: var(--red); }
+  .score-badge.none { background: var(--surface2);  color: var(--muted); }
+
+  /* ── モーダル ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.6);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    width: 100%;
+    max-width: 460px;
+    box-shadow: 0 24px 64px rgba(0,0,0,.5);
+  }
+  .modal h3 { font-size: .8rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--sub); margin-bottom: 18px; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .form-group textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: .9rem;
+    font-family: inherit;
+    color: var(--text);
+    resize: vertical;
+    outline: none;
+    transition: border-color .18s;
+  }
+  .form-group textarea::placeholder { color: var(--muted); }
+  .form-group textarea:focus { border-color: var(--accent); }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+  .btn-cancel { background: var(--surface2); border: 1px solid var(--border); color: var(--sub); padding: 9px 18px; border-radius: 8px; cursor: pointer; font-size: .8rem; font-weight: 600; }
+  .btn-save { background: var(--accent2); color: white; border: none; padding: 9px 18px; border-radius: 8px; cursor: pointer; font-size: .8rem; font-weight: 700; letter-spacing: .04em; }
+
+  /* 空状態 */
+  .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .empty-icon { font-size: 2rem; margin-bottom: 12px; opacity: .4; }
+  .empty p { font-size: .85rem; line-height: 1.6; }
+
+  /* ── 設定 ── */
+  .setting-section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
+  .setting-section-title { font-size: .68rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding: 10px 14px; background: var(--surface2); border-bottom: 1px solid var(--border); }
+  .setting-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 14px; border-bottom: 1px solid var(--border); font-size: .85rem; }
+  .setting-row:last-child { border-bottom: none; }
+  .setting-row label { font-weight: 500; color: var(--text); }
+  .setting-row select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 7px;
+    padding: 4px 8px;
+    font-size: .8rem;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 110px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--surface2);
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+  .range-val { font-size: .75rem; color: var(--muted); width: 28px; text-align: right; }
+  .danger-btn { background: rgba(248,113,113,.15); border: 1px solid rgba(248,113,113,.3); color: var(--red); padding: 5px 12px; border-radius: 7px; cursor: pointer; font-size: .75rem; font-weight: 700; letter-spacing: .04em; transition: all .15s; }
+  .danger-btn:hover { background: rgba(248,113,113,.25); }
+  .warn-btn { background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.3); color: var(--yellow); padding: 5px 12px; border-radius: 7px; cursor: pointer; font-size: .75rem; font-weight: 700; letter-spacing: .04em; transition: all .15s; }
+  .warn-btn:hover { background: rgba(251,191,36,.22); }
+
+  @media (max-width: 480px) {
+    .card-text { font-size: 1rem; }
+    .mode-btn { font-size: .65rem; padding: 7px 2px; }
+    .fb-btn { font-size: .7rem; }
+  }
+
+  /* ── SVGアイコン用インライン ── */
+  .icon { display: inline-block; line-height: 1; }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="header-title">English Trainer</span>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showPage('practice',this)">練習</button>
+    <button class="tab-btn" onclick="showPage('list',this)">リスト</button>
+    <button class="tab-btn" onclick="showPage('settings',this)">設定</button>
+  </div>
+</header>
+
+<!-- ── 練習ページ ── -->
+<div class="page active" id="page-practice">
+  <div id="empty-practice" class="empty" style="display:none">
+    <div class="empty-icon">—</div>
+    <p>スクリプトが登録されていません<br>「リスト」タブから追加してください</p>
+  </div>
+
+  <div id="practice-content">
+    <div class="mode-bar">
+      <button class="mode-btn active" id="mode-seq"   onclick="setMode('seq')">順番</button>
+      <button class="mode-btn"        id="mode-rand"  onclick="setMode('rand')">ランダム</button>
+      <button class="mode-btn"        id="mode-hard"  onclick="setMode('hard')">苦手順</button>
+      <button class="mode-btn"        id="mode-smart" onclick="setMode('smart')">スマート</button>
+    </div>
+
+    <div class="card-meta">
+      <span class="card-counter" id="card-counter"></span>
+      <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+    </div>
+
+    <div class="flip-card" id="flip-card" onclick="flipCard()">
+      <div class="flip-inner">
+        <div class="flip-front">
+          <div class="card-label">日本語</div>
+          <div class="card-text" id="card-ja"></div>
+          <div class="card-hint">タップで英語を表示</div>
+        </div>
+        <div class="flip-back">
+          <div class="card-label">English</div>
+          <div class="card-text" id="card-en"></div>
+          <div class="card-hint">タップで日本語に戻る</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="ctrl-btn" title="前へ" onclick="prevCard()">
+        <svg viewBox="0 0 16 16"><path d="M10 3L5 8l5 5V3z"/></svg>
+      </button>
+      <button class="ctrl-btn play" title="読み上げ" onclick="speak()">
+        <svg viewBox="0 0 16 16"><path d="M4 3l10 5-10 5V3z"/></svg>
+      </button>
+      <button class="ctrl-btn" title="次へ" onclick="nextCard()">
+        <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5V3z"/></svg>
+      </button>
+    </div>
+
+    <div class="fb-label">理解度を記録 — 次のカードへ進みます</div>
+    <div class="feedback-bar">
+      <button class="fb-btn ok" onclick="recordFeedback('ok')">
+        <div class="fb-icon">✓</div>覚えた
+      </button>
+      <button class="fb-btn so" onclick="recordFeedback('so')">
+        <div class="fb-icon">△</div>うろ覚え
+      </button>
+      <button class="fb-btn ng" onclick="recordFeedback('ng')">
+        <div class="fb-icon">✕</div>わからない
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── リストページ ── -->
+<div class="page" id="page-list">
+  <div class="list-header">
+    <span class="list-title">Scripts</span>
+    <button class="add-btn" onclick="openModal()">+ 追加</button>
+  </div>
+  <div class="list-filter">
+    <button class="filter-btn active" onclick="setListFilter('all',this)">すべて</button>
+    <button class="filter-btn" onclick="setListFilter('ng',this)">苦手</button>
+    <button class="filter-btn" onclick="setListFilter('so',this)">うろ覚え</button>
+    <button class="filter-btn" onclick="setListFilter('ok',this)">覚えた</button>
+    <button class="filter-btn" onclick="setListFilter('none',this)">未回答</button>
+  </div>
+  <div id="script-list"></div>
+</div>
+
+<!-- ── 設定ページ ── -->
+<div class="page" id="page-settings">
+  <div class="setting-section">
+    <div class="setting-section-title">音声設定</div>
+    <div class="setting-row">
+      <label>読み上げ速度</label>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="range-val" id="rate-val"></span>
+        <input type="range" id="rate" min="0.5" max="2" step="0.1" value="1" oninput="updateRate()">
+      </div>
+    </div>
+    <div class="setting-row">
+      <label>音声の高さ</label>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="range-val" id="pitch-val"></span>
+        <input type="range" id="pitch" min="0.5" max="2" step="0.1" value="1" oninput="updatePitch()">
+      </div>
+    </div>
+    <div class="setting-row">
+      <label>音声</label>
+      <select id="voice-select" onchange="saveSettings()"></select>
+    </div>
+  </div>
+  <div class="setting-section">
+    <div class="setting-section-title">データ管理</div>
+    <div class="setting-row">
+      <label>フィードバック履歴をリセット</label>
+      <button class="warn-btn" onclick="resetScores()">リセット</button>
+    </div>
+    <div class="setting-row">
+      <label>スクリプトをすべて削除</label>
+      <button class="danger-btn" onclick="clearAll()">削除</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── モーダル ── -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">スクリプトを追加</h3>
+    <div class="form-group">
+      <label>English</label>
+      <textarea id="input-en" rows="3" placeholder="e.g. How are you doing today?"></textarea>
+    </div>
+    <div class="form-group">
+      <label>日本語訳</label>
+      <textarea id="input-ja" rows="2" placeholder="e.g. 今日はいかがお過ごしですか？"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
+      <button class="btn-save" onclick="saveScript()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DEFAULT_SCRIPTS = [
+  { en: "Can everyone hear me okay?", ja: "皆さん、聞こえていますか?" },
+  { en: "Sorry I'm a bit late, I had a connection issue.", ja: "遅れてすみません、接続トラブルがありました。" },
+  { en: "Shall we get started?", ja: "始めましょうか。" },
+  { en: "Let's wait a couple more minutes for others to join.", ja: "他の参加者を数分待ちましょう。" },
+  { en: "I'll be taking notes today.", ja: "今日は私が議事録を取ります。" },
+  { en: "You're on mute.", ja: "ミュートになっています。" },
+  { en: "Sorry, you're cutting out / breaking up.", ja: "すみません、音声が途切れています。" },
+  { en: "Could you say that again?", ja: "もう一度言っていただけますか?" },
+  { en: "The connection seems unstable.", ja: "接続が不安定なようです。" },
+  { en: "Can you hear me now?", ja: "今は聞こえますか?" },
+  { en: "I'll turn my camera off to save bandwidth.", ja: "帯域を節約するためカメラをオフにします。" },
+  { en: "Let's move on to the next item on the agenda.", ja: "次の議題に移りましょう。" },
+  { en: "Before we move on, does anyone have questions?", ja: "次に行く前に、質問はありますか?" },
+  { en: "We're running short on time, so let's wrap this up.", ja: "時間が押しているので、まとめましょう。" },
+  { en: "Let's circle back to this point later.", ja: "この点は後で改めて議論しましょう。" },
+  { en: "I think we're getting off track.", ja: "話が少し脱線していると思います。" },
+  { en: "Could I add something here?", ja: "ここで一点よろしいでしょうか。" },
+  { en: "From a technical perspective, I'd suggest...", ja: "技術的な観点では、〜を提案します。" },
+  { en: "I have a question about...", ja: "〜について質問があります。" },
+  { en: "Sorry, could you clarify what you mean by...?", ja: "すみません、〜とはどういう意味か説明していただけますか?" },
+  { en: "I'm not sure I fully understood. Could you elaborate?", ja: "完全には理解できていないので、詳しく説明していただけますか?" },
+  { en: "Just to confirm, are you saying that...?", ja: "確認ですが、〜ということでしょうか?" },
+  { en: "I agree with that point, but I'd also add...", ja: "その点には同意しますが、加えて〜も挙げたいです。" },
+  { en: "I see it a bit differently.", ja: "私はちょっと違う見方をしています。" },
+  { en: "That makes sense.", ja: "なるほど、理解できます。" },
+  { en: "Good point.", ja: "いい指摘ですね。" },
+  { en: "Right, exactly.", ja: "そうですね、まさにその通りです。" },
+  { en: "I see what you mean.", ja: "おっしゃることは分かります。" },
+  { en: "Let me think about that for a second.", ja: "少し考えさせてください。" },
+  { en: "That's a fair point, but...", ja: "それは妥当な指摘ですが、〜" },
+  { en: "Let's summarize the key takeaways.", ja: "重要なポイントをまとめましょう。" },
+  { en: "To recap, we agreed on...", ja: "振り返ると、〜について合意しました。" },
+  { en: "What are the next steps?", ja: "次のステップは何ですか?" },
+  { en: "Who will be the owner of this action item?", ja: "このアクションアイテムの担当は誰ですか?" },
+  { en: "Thanks everyone, see you next time.", ja: "ありがとうございました、また次回。" },
+];
+
+let scripts = JSON.parse(localStorage.getItem('eng_scripts') || 'null');
+if (scripts === null) {
+  scripts = DEFAULT_SCRIPTS.map(s => ({ ...s, score: { ok:0, so:0, ng:0, lastReviewed:null, interval:24 } }));
+  persist();
+}
+scripts = scripts.map(s => ({
+  ...s,
+  score: { ok:0, so:0, ng:0, lastReviewed:null, interval:24, ...(s.score||{}) }
+}));
+
+let settings = JSON.parse(localStorage.getItem('eng_settings') || '{"rate":1,"pitch":1,"voiceURI":""}');
+let mode = 'seq';
+let playOrder = [];
+let currentPos = 0;
+let listFilter_current = 'all';
+let editingIdx = null;
+
+function diffScore(s) {
+  const sc = s.score;
+  return sc.ng * 3 + sc.so - sc.ok * 2;
+}
+function dueScore(s, now) {
+  const sc = s.score;
+  if (!sc.lastReviewed) return Infinity;
+  return (now - sc.lastReviewed) / 3600000 / sc.interval;
+}
+function dominantResult(s) {
+  const { ok, so, ng } = s.score;
+  if (!ok && !so && !ng) return 'none';
+  if (ng >= so && ng >= ok) return 'ng';
+  if (so >= ok) return 'so';
+  return 'ok';
+}
+
+function buildPlayOrder() {
+  if (!scripts.length) { playOrder = []; return; }
+  const idx = scripts.map((_, i) => i);
+  if (mode === 'seq') {
+    playOrder = idx;
+  } else if (mode === 'rand') {
+    playOrder = [...idx];
+    for (let i = playOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [playOrder[i], playOrder[j]] = [playOrder[j], playOrder[i]];
+    }
+  } else if (mode === 'hard') {
+    playOrder = [...idx].sort((a, b) => diffScore(scripts[b]) - diffScore(scripts[a]));
+  } else {
+    const now = Date.now();
+    playOrder = [...idx].sort((a, b) => dueScore(scripts[b], now) - dueScore(scripts[a], now));
+  }
+  currentPos = 0;
+}
+
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'practice') renderCard();
+  if (name === 'list') renderList();
+}
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('mode-' + m).classList.add('active');
+  buildPlayOrder();
+  renderCard();
+}
+
+function renderCard() {
+  const content = document.getElementById('practice-content');
+  const empty   = document.getElementById('empty-practice');
+  if (!scripts.length) { content.style.display='none'; empty.style.display='block'; return; }
+  if (!playOrder.length) buildPlayOrder();
+  content.style.display='block'; empty.style.display='none';
+  if (currentPos >= playOrder.length) currentPos = 0;
+  const s = scripts[playOrder[currentPos]];
+  document.getElementById('card-en').textContent = s.en;
+  document.getElementById('card-ja').textContent = s.ja || '（日本語訳なし）';
+  document.getElementById('card-counter').textContent = `${currentPos + 1} / ${playOrder.length}`;
+  const pct = playOrder.length > 1 ? (currentPos / (playOrder.length - 1)) * 100 : 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('flip-card').classList.remove('flipped');
+}
+
+function flipCard() { document.getElementById('flip-card').classList.toggle('flipped'); }
+function prevCard() { if (!playOrder.length) return; currentPos = (currentPos - 1 + playOrder.length) % playOrder.length; renderCard(); }
+function nextCard() { if (!playOrder.length) return; currentPos = (currentPos + 1) % playOrder.length; renderCard(); }
+
+function recordFeedback(type) {
+  if (!playOrder.length) return;
+  const sc = scripts[playOrder[currentPos]].score;
+  sc[type]++;
+  sc.lastReviewed = Date.now();
+  if (type === 'ok') sc.interval = Math.min(sc.interval * 2.5, 720);
+  else if (type === 'so') sc.interval = Math.max(sc.interval * 1.2, 12);
+  else sc.interval = 1;
+  persist();
+  const card = document.getElementById('flip-card');
+  card.style.transition = 'opacity .15s';
+  card.style.opacity = '0';
+  setTimeout(() => { card.style.opacity='1'; card.style.transition=''; nextCard(); }, 160);
+}
+
+function speak() {
+  if (!playOrder.length) return;
+  const utter = new SpeechSynthesisUtterance(scripts[playOrder[currentPos]].en);
+  utter.rate = parseFloat(settings.rate);
+  utter.pitch = parseFloat(settings.pitch);
+  const voices = speechSynthesis.getVoices();
+  const v = voices.find(v => v.voiceURI === settings.voiceURI) || voices.find(v => v.lang.startsWith('en'));
+  if (v) utter.voice = v;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utter);
+}
+
+function setListFilter(f, btn) {
+  listFilter_current = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderList();
+}
+
+function renderList() {
+  const el = document.getElementById('script-list');
+  if (!scripts.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">—</div><p>まだスクリプトがありません</p></div>';
+    return;
+  }
+  const filtered = scripts.map((s, i) => ({ s, i })).filter(({ s }) => {
+    if (listFilter_current === 'all')  return true;
+    if (listFilter_current === 'none') return dominantResult(s) === 'none';
+    return dominantResult(s) === listFilter_current;
+  });
+  if (!filtered.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">—</div><p>該当するスクリプトがありません</p></div>';
+    return;
+  }
+  el.innerHTML = filtered.map(({ s, i }) => {
+    const sc = s.score;
+    const hasScore = sc.ok + sc.so + sc.ng > 0;
+    const dom = dominantResult(s);
+    const barClass = { ok:'easy', so:'mid', ng:'hard', none:'none' }[dom];
+    const badges = hasScore
+      ? `<span class="score-badge ok">✓ ${sc.ok}</span><span class="score-badge so">△ ${sc.so}</span><span class="score-badge ng">✕ ${sc.ng}</span>`
+      : `<span class="score-badge none">未回答</span>`;
+    return `
+      <div class="script-item">
+        <div class="script-item-top">
+          <div class="diff-bar ${barClass}"></div>
+          <div class="script-item-body">
+            <div class="script-en">${esc(s.en)}</div>
+            <div class="script-ja">${esc(s.ja||'─')}</div>
+          </div>
+          <div class="item-actions">
+            <button class="icon-btn" onclick="openModal(${i})">編</button>
+            <button class="icon-btn del" onclick="deleteScript(${i})">削</button>
+          </div>
+        </div>
+        <div class="score-row">${badges}</div>
+      </div>`;
+  }).join('');
+}
+
+function esc(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function openModal(idx=null) {
+  editingIdx = idx;
+  document.getElementById('modal-title').textContent = idx===null ? 'スクリプトを追加' : 'スクリプトを編集';
+  document.getElementById('input-en').value = idx!==null ? scripts[idx].en : '';
+  document.getElementById('input-ja').value = idx!==null ? scripts[idx].ja : '';
+  document.getElementById('modal').classList.add('open');
+  setTimeout(() => document.getElementById('input-en').focus(), 100);
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); editingIdx=null; }
+
+function saveScript() {
+  const en = document.getElementById('input-en').value.trim();
+  const ja = document.getElementById('input-ja').value.trim();
+  if (!en) { alert('英語テキストを入力してください'); return; }
+  if (editingIdx!==null) scripts[editingIdx] = { ...scripts[editingIdx], en, ja };
+  else scripts.push({ en, ja, score: { ok:0, so:0, ng:0, lastReviewed:null, interval:24 } });
+  persist(); buildPlayOrder(); closeModal(); renderList();
+}
+
+function deleteScript(idx) {
+  if (!confirm('このスクリプトを削除しますか？')) return;
+  scripts.splice(idx, 1);
+  persist(); buildPlayOrder(); renderList();
+}
+function clearAll() {
+  if (!confirm('すべてのスクリプトを削除しますか？')) return;
+  scripts=[]; persist(); buildPlayOrder(); renderList();
+}
+function resetScores() {
+  if (!confirm('フィードバック履歴をリセットしますか？')) return;
+  scripts = scripts.map(s => ({ ...s, score:{ ok:0, so:0, ng:0, lastReviewed:null, interval:24 } }));
+  persist();
+}
+function persist() { localStorage.setItem('eng_scripts', JSON.stringify(scripts)); }
+
+function updateRate()  { settings.rate=document.getElementById('rate').value; document.getElementById('rate-val').textContent=parseFloat(settings.rate).toFixed(1); saveSettings(); }
+function updatePitch() { settings.pitch=document.getElementById('pitch').value; document.getElementById('pitch-val').textContent=parseFloat(settings.pitch).toFixed(1); saveSettings(); }
+function saveSettings() { settings.voiceURI=document.getElementById('voice-select').value; localStorage.setItem('eng_settings',JSON.stringify(settings)); }
+
+function populateVoices() {
+  const voices = speechSynthesis.getVoices();
+  const sel = document.getElementById('voice-select');
+  sel.innerHTML = '';
+  voices.filter(v => v.lang.startsWith('en')).forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v.voiceURI;
+    opt.textContent = `${v.name} (${v.lang})`;
+    if (v.voiceURI === settings.voiceURI) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+document.getElementById('rate').value  = settings.rate;
+document.getElementById('pitch').value = settings.pitch;
+document.getElementById('rate-val').textContent  = parseFloat(settings.rate).toFixed(1);
+document.getElementById('pitch-val').textContent = parseFloat(settings.pitch).toFixed(1);
+speechSynthesis.onvoiceschanged = populateVoices;
+populateVoices();
+document.getElementById('modal').addEventListener('click', e => { if (e.target===e.currentTarget) closeModal(); });
+
+buildPlayOrder();
+renderCard();
+</script>
+</body>
+</html>
