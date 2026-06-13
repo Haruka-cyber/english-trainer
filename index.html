@@ -880,6 +880,50 @@ function resetScores() {
   scripts = scripts.map(s => ({ ...s, score:{ ok:0, so:0, ng:0, lastReviewed:null, interval:24 } }));
   persist();
 }
+// ── Google Sheets 同期 ──
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwCBRFRzgCIHrHGmBmKCv9QmTntl8GfBFhQTtMvu5SgCAbjPr9yHHojilph1RSvYow/exec';
+
+function setSyncStatus(msg, color) {
+  const el = document.getElementById('sync-status');
+  el.textContent = msg;
+  el.style.color = color || 'rgba(255,255,255,.5)';
+}
+
+async function syncFromCloud() {
+  setSyncStatus('同期中...', 'rgba(255,255,255,.6)');
+  try {
+    const res = await fetch(GAS_URL);
+    const data = await res.json();
+    let merged = false;
+    scripts.forEach(s => {
+      if (data[s.en]) {
+        s.score = { ok:0, so:0, ng:0, lastReviewed:null, interval:24, ...data[s.en] };
+        merged = true;
+      }
+    });
+    if (merged) { persist(); renderCard(); if (document.getElementById('page-list').classList.contains('active')) renderList(); }
+    setSyncStatus('同期済み', '#34d399');
+    setTimeout(() => setSyncStatus(''), 3000);
+  } catch(e) {
+    setSyncStatus('オフライン', 'rgba(255,255,255,.35)');
+  }
+}
+
+async function syncToCloud() {
+  const payload = {};
+  scripts.forEach(s => { payload[s.en] = s.score; });
+  try {
+    await fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    setSyncStatus('保存済み', '#34d399');
+    setTimeout(() => setSyncStatus(''), 2000);
+  } catch(e) {
+    setSyncStatus('オフライン', 'rgba(255,255,255,.35)');
+  }
+}
+
 function persist() { localStorage.setItem('eng_scripts', JSON.stringify(scripts)); }
 
 function updateRate()  { settings.rate=document.getElementById('rate').value; document.getElementById('rate-val').textContent=parseFloat(settings.rate).toFixed(1); saveSettings(); }
