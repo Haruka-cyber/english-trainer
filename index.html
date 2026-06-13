@@ -975,10 +975,16 @@ function closeModal() { document.getElementById('modal').classList.remove('open'
 function saveScript() {
   const en = document.getElementById('input-en').value.trim();
   const ja = document.getElementById('input-ja').value.trim();
+  const selVal = document.getElementById('input-tag-select').value;
+  const tag = selVal === '__new__'
+    ? document.getElementById('input-tag-custom').value.trim()
+    : selVal;
   if (!en) { alert('英語テキストを入力してください'); return; }
-  if (editingIdx!==null) scripts[editingIdx] = { ...scripts[editingIdx], en, ja };
-  else scripts.push({ en, ja, score: { ok:0, so:0, ng:0, lastReviewed:null, interval:24 } });
-  persist(); buildPlayOrder(); closeModal(); renderList();
+  if (editingIdx!==null) scripts[editingIdx] = { ...scripts[editingIdx], en, ja, tag };
+  else scripts.push({ en, ja, tag, score: { ok:0, so:0, ng:0, lastReviewed:null, interval:24 } });
+  persist(); buildPlayOrder(); closeModal();
+  renderTagBar('list-tag-bar', listTag, setListTag);
+  renderList();
 }
 
 function deleteScript(idx) {
