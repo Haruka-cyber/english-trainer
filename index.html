@@ -907,6 +907,7 @@ function speak() {
   if (!playOrder.length) return;
   const enOnly = extractEnglish(scripts[playOrder[currentPos]].en);
   const utter = new SpeechSynthesisUtterance(enOnly);
+  utter.lang = 'en-US';
   utter.rate = parseFloat(settings.rate);
   utter.pitch = parseFloat(settings.pitch);
   const voices = speechSynthesis.getVoices();
