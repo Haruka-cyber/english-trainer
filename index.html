@@ -900,9 +900,13 @@ function recordFeedback(type) {
   setTimeout(() => { card.style.opacity='1'; card.style.transition=''; nextCard(); }, 160);
 }
 
+function extractEnglish(text) {
+  return text.replace(/[　-鿿豈-﫿＀-￯]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
 function speak() {
   if (!playOrder.length) return;
-  const utter = new SpeechSynthesisUtterance(scripts[playOrder[currentPos]].en);
+  const enOnly = extractEnglish(scripts[playOrder[currentPos]].en);
+  const utter = new SpeechSynthesisUtterance(enOnly);
   utter.rate = parseFloat(settings.rate);
   utter.pitch = parseFloat(settings.pitch);
   const voices = speechSynthesis.getVoices();
