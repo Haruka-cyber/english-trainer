@@ -694,71 +694,94 @@
 </div>
 
 <script>
+const SCRIPTS_VERSION = 2;
 const DEFAULT_SCRIPTS = [
-  { en: "Can everyone hear me okay?", ja: "皆さん、聞こえていますか?" },
-  { en: "Sorry I'm a bit late, I had a connection issue.", ja: "遅れてすみません、接続トラブルがありました。" },
-  { en: "Shall we get started?", ja: "始めましょうか。" },
-  { en: "Let's get started, shall we?", ja: "では始めましょうか。" },
-  { en: "Let's wait a couple more minutes for others to join.", ja: "他の参加者を数分待ちましょう。" },
-  { en: "I'll be taking notes today.", ja: "今日は私が議事録を取ります。" },
-  { en: "Does everyone have a copy of the agenda?", ja: "皆さん、議題のコピーはお持ちですか?" },
-  { en: "Let's go around and introduce ourselves.", ja: "一人ずつ自己紹介しましょう。" },
-  { en: "Our goal for this meeting is to...", ja: "今日の会議の目的は〜です。" },
-  { en: "You're on mute.", ja: "ミュートになっています。" },
-  { en: "Sorry, you're cutting out / breaking up.", ja: "すみません、音声が途切れています。" },
-  { en: "Could you say that again?", ja: "もう一度言っていただけますか?" },
-  { en: "The connection seems unstable.", ja: "接続が不安定なようです。" },
-  { en: "Can you hear me now?", ja: "今は聞こえますか?" },
-  { en: "I'll turn my camera off to save bandwidth.", ja: "帯域を節約するためカメラをオフにします。" },
-  { en: "Let's move on to the next item on the agenda.", ja: "次の議題に移りましょう。" },
-  { en: "Before we move on, does anyone have questions?", ja: "次に行く前に、質問はありますか?" },
-  { en: "We're running short on time, so let's wrap this up.", ja: "時間が押しているので、まとめましょう。" },
-  { en: "Let's circle back to this point later.", ja: "この点は後で改めて議論しましょう。" },
-  { en: "I think we're getting off track.", ja: "話が少し脱線していると思います。" },
-  { en: "Let's get down to business.", ja: "本題に入りましょう。" },
-  { en: "Can you leave it with me? I'll find out and let you know.", ja: "こちらで対応しておきます。確認して後ほどお知らせします。" },
-  { en: "Could I add something here?", ja: "ここで一点よろしいでしょうか。" },
-  { en: "From a technical perspective, I'd suggest...", ja: "技術的な観点では、〜を提案します。" },
-  { en: "I have a question about...", ja: "〜について質問があります。" },
-  { en: "Sorry, could you clarify what you mean by...?", ja: "すみません、〜とはどういう意味か説明していただけますか?" },
-  { en: "I'm not sure I fully understood. Could you elaborate?", ja: "完全には理解できていないので、詳しく説明していただけますか?" },
-  { en: "Just to confirm, are you saying that...?", ja: "確認ですが、〜ということでしょうか?" },
-  { en: "I agree with that point, but I'd also add...", ja: "その点には同意しますが、加えて〜も挙げたいです。" },
-  { en: "I see it a bit differently.", ja: "私はちょっと違う見方をしています。" },
-  { en: "That makes sense.", ja: "なるほど、理解できます。" },
-  { en: "Good point.", ja: "いい指摘ですね。" },
-  { en: "Right, exactly.", ja: "そうですね、まさにその通りです。" },
-  { en: "I see what you mean.", ja: "おっしゃることは分かります。" },
-  { en: "Let me think about that for a second.", ja: "少し考えさせてください。" },
-  { en: "That's a fair point, but...", ja: "それは妥当な指摘ですが、〜" },
-  { en: "Let's summarize the key takeaways.", ja: "重要なポイントをまとめましょう。" },
-  { en: "To recap, we agreed on...", ja: "振り返ると、〜について合意しました。" },
-  { en: "What are the next steps?", ja: "次のステップは何ですか?" },
-  { en: "Who will be the owner of this action item?", ja: "このアクションアイテムの担当は誰ですか?" },
-  { en: "Thanks everyone, see you next time.", ja: "ありがとうございました、また次回。" },
+  // Web会議
+  { en: "Can you hear me okay?", ja: "聞こえていますか？", tag: "Web会議" },
+  { en: "Sorry, I think you're on mute.", ja: "すみません、ミュートになっていますよ。", tag: "Web会議" },
+  { en: "You're breaking up a little.", ja: "少し音声が途切れています。", tag: "Web会議" },
+  { en: "Can everyone see my screen?", ja: "画面は見えていますか？", tag: "Web会議" },
+  { en: "Let me share my screen.", ja: "画面を共有します。", tag: "Web会議" },
+  { en: "Sorry, go ahead.", ja: "すみません、お先にどうぞ。", tag: "Web会議" },
+  // 聞き返し・確認
+  { en: "Sorry, could you repeat that?", ja: "すみません、もう一度お願いします。", tag: "聞き返し・確認" },
+  { en: "Could you slow down a little, please?", ja: "少しゆっくり話してもらえますか？", tag: "聞き返し・確認" },
+  { en: "Sorry, I didn't catch the last part.", ja: "すみません、最後が聞き取れませんでした。", tag: "聞き返し・確認" },
+  { en: "Just to make sure I understand, you mean it's ready?", ja: "確認ですが、準備ができたという意味ですか？", tag: "聞き返し・確認" },
+  { en: "Could you say that in other words?", ja: "別の言い方をしてもらえますか？", tag: "聞き返し・確認" },
+  { en: "Let me make sure I'm following you.", ja: "ついていけているか確認させてください。", tag: "聞き返し・確認" },
+  { en: "Can you give us an example?", ja: "例を挙げてもらえますか？", tag: "聞き返し・確認" },
+  { en: "What do you mean by that exactly?", ja: "具体的にどういう意味ですか？", tag: "聞き返し・確認" },
+  // 時間稼ぎ
+  { en: "That's a good question.", ja: "いい質問ですね。", tag: "時間稼ぎ" },
+  { en: "Let me think about that for a second.", ja: "少し考えさせてください。", tag: "時間稼ぎ" },
+  { en: "Good point. Let me come back to that.", ja: "いい点ですね、後で戻ります。", tag: "時間稼ぎ" },
+  { en: "I'm not sure off the top of my head.", ja: "すぐには分かりません。", tag: "時間稼ぎ" },
+  { en: "Can I get back to you on that?", ja: "それは後ほど回答してもいいですか？", tag: "時間稼ぎ" },
+  // 意見
+  { en: "From my perspective, this is risky.", ja: "私の見方では、これはリスクがあります。", tag: "意見" },
+  { en: "I think we should test it first.", ja: "まずテストすべきだと思います。", tag: "意見" },
+  { en: "In my opinion, the main issue is cost.", ja: "私の意見では、主な問題はコストです。", tag: "意見" },
+  { en: "I'd suggest we start small.", ja: "小さく始めることを提案します。", tag: "意見" },
+  { en: "The way I see it, we have time.", ja: "私が思うに、まだ時間はあります。", tag: "意見" },
+  // 賛成・同意
+  { en: "That makes sense to me.", ja: "それは納得できます。", tag: "賛成・同意" },
+  { en: "I agree with that.", ja: "それに賛成です。", tag: "賛成・同意" },
+  { en: "Good point, and I'd add one thing.", ja: "いい点ですね、一つ付け加えます。", tag: "賛成・同意" },
+  { en: "Exactly, that's what I was thinking.", ja: "まさに、私もそう思っていました。", tag: "賛成・同意" },
+  // 反対・保留
+  { en: "I see your point, but I'm worried about timing.", ja: "おっしゃることは分かりますが、時期が心配です。", tag: "反対・保留" },
+  { en: "I'm not so sure about that.", ja: "それには少し賛成しかねます。", tag: "反対・保留" },
+  { en: "I'd push back on that a little.", ja: "それには少し異論があります。", tag: "反対・保留" },
+  { en: "Can we park that for now?", ja: "一旦それは保留にできますか？", tag: "反対・保留" },
+  // 割り込み・質問
+  { en: "Can I jump in here?", ja: "一つよろしいですか？（割り込み）", tag: "割り込み・質問" },
+  { en: "Sorry to interrupt, but I have a concern.", ja: "中断してすみませんが、懸念があります。", tag: "割り込み・質問" },
+  { en: "I have a quick question.", ja: "短い質問があります。", tag: "割り込み・質問" },
+  { en: "Can I add something?", ja: "一点付け加えてもいいですか？", tag: "割り込み・質問" },
+  // 会議進行
+  { en: "Let's circle back to that later.", ja: "それは後で戻りましょう。", tag: "会議進行" },
+  { en: "Can we take this offline?", ja: "これは別途話しませんか？", tag: "会議進行" },
+  { en: "Let's move on to the next point.", ja: "次の点に移りましょう。", tag: "会議進行" },
+  { en: "Let's align on the goal first.", ja: "まず目標で認識を合わせましょう。", tag: "会議進行" },
+  { en: "Just to recap, we agreed on two things.", ja: "要点をまとめると、2点で合意しました。", tag: "会議進行" },
+  { en: "So the action item is to send the report.", ja: "つまりタスクはレポート送付ですね。", tag: "会議進行" },
+  { en: "Who's owning this?", ja: "これの担当は誰ですか？", tag: "会議進行" },
+  { en: "What's the timeline on this?", ja: "これの期限は？", tag: "会議進行" },
+  { en: "Can you give us the high-level summary?", ja: "概要だけ教えてもらえますか？", tag: "会議進行" },
+  { en: "I want to make sure we're on the same page.", ja: "認識が一致しているか確認したいです。", tag: "会議進行" },
+  // フォロー
+  { en: "Does that answer your question?", ja: "質問の答えになっていますか？", tag: "フォロー" },
+  { en: "I'll follow up on this.", ja: "これは私がフォローします。", tag: "フォロー" },
+  { en: "I'll loop in the team.", ja: "チームに共有します。", tag: "フォロー" },
+  { en: "Let's sync up tomorrow.", ja: "明日すり合わせましょう。", tag: "フォロー" },
 ];
 
-let scripts = JSON.parse(localStorage.getItem('eng_scripts') || 'null');
-if (scripts === null) {
+const savedVersion = parseInt(localStorage.getItem('eng_scripts_version') || '0');
+let scripts;
+if (savedVersion < SCRIPTS_VERSION) {
   scripts = DEFAULT_SCRIPTS.map(s => ({ ...s, score: { ok:0, so:0, ng:0, lastReviewed:null, interval:24 } }));
+  localStorage.setItem('eng_scripts_version', SCRIPTS_VERSION);
+  persist();
+} else {
+  scripts = JSON.parse(localStorage.getItem('eng_scripts') || 'null');
+  if (scripts === null) {
+    scripts = DEFAULT_SCRIPTS.map(s => ({ ...s, score: { ok:0, so:0, ng:0, lastReviewed:null, interval:24 } }));
+    persist();
+  }
+  scripts = scripts.map(s => ({
+    ...s,
+    score: { ok:0, so:0, ng:0, lastReviewed:null, interval:24, ...(s.score||{}) },
+    tag: s.tag || 'Web会議'
+  }));
+  const existingEn = new Set(scripts.map(s => s.en));
+  DEFAULT_SCRIPTS.forEach(s => {
+    if (!existingEn.has(s.en)) {
+      scripts.push({ ...s, score: { ok:0, so:0, ng:0, lastReviewed:null, interval:24 } });
+    }
+  });
   persist();
 }
-scripts = scripts.map(s => ({
-  ...s,
-  score: { ok:0, so:0, ng:0, lastReviewed:null, interval:24, ...(s.score||{}) }
-}));
-// DEFAULT_SCRIPTSに新規追加されたフレーズをマージ
-const existingEn = new Set(scripts.map(s => s.en));
-DEFAULT_SCRIPTS.forEach(s => {
-  if (!existingEn.has(s.en)) {
-    scripts.push({ ...s, score: { ok:0, so:0, ng:0, lastReviewed:null, interval:24 } });
-  }
-});
-persist();
-
-// 既存スクリプトにタグがなければ補完
-scripts = scripts.map(s => ({ ...s, tag: s.tag || 'Web会議' }));
-persist();
 
 let settings = JSON.parse(localStorage.getItem('eng_settings') || '{"rate":1,"pitch":1,"voiceURI":""}');
 let mode = 'seq';
