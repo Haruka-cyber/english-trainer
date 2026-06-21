@@ -779,6 +779,13 @@
   <div class="setting-section">
     <div class="setting-section-title">データ管理</div>
     <div class="setting-row">
+      <label style="display:flex;flex-direction:column;gap:3px">
+        <span>既定スクリプトを更新</span>
+        <span style="font-size:.72rem;color:var(--muted);font-weight:400">追加・削除・日本語を最新版に合わせる。自己採点は保持。</span>
+      </label>
+      <button class="warn-btn" onclick="updateDefaultScripts()">更新</button>
+    </div>
+    <div class="setting-row">
       <label>フィードバック履歴をリセット</label>
       <button class="warn-btn" onclick="resetScores()">リセット</button>
     </div>
