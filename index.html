@@ -676,17 +676,32 @@
       </button>
     </div>
 
-    <div class="fb-label">理解度を記録 — 次のカードへ進みます</div>
-    <div class="feedback-bar">
-      <button class="fb-btn ok" onclick="recordFeedback('ok')">
-        <div class="fb-icon">✓</div>覚えた
-      </button>
-      <button class="fb-btn so" onclick="recordFeedback('so')">
-        <div class="fb-icon">△</div>うろ覚え
-      </button>
-      <button class="fb-btn ng" onclick="recordFeedback('ng')">
-        <div class="fb-icon">✕</div>わからない
-      </button>
+    <div id="normal-feedback-wrap">
+      <div class="fb-label">理解度を記録 — 次のカードへ進みます</div>
+      <div class="feedback-bar">
+        <button class="fb-btn ok" onclick="recordFeedback('ok')">
+          <div class="fb-icon">✓</div>覚えた
+        </button>
+        <button class="fb-btn so" onclick="recordFeedback('so')">
+          <div class="fb-icon">△</div>うろ覚え
+        </button>
+        <button class="fb-btn ng" onclick="recordFeedback('ng')">
+          <div class="fb-icon">✕</div>わからない
+        </button>
+      </div>
+    </div>
+    <div id="speed-feedback-wrap" style="display:none">
+      <div class="fb-label">口から出ましたか？ — 次のカードへ進みます</div>
+      <div class="speed-fb-bar">
+        <button class="speed-fb-btn fast" onclick="recordSpeedFeedback(true)">
+          <div class="fb-icon" style="background:var(--green-bg);color:var(--green)">⚡</div>
+          速く出た
+        </button>
+        <button class="speed-fb-btn slow" onclick="recordSpeedFeedback(false)">
+          <div class="fb-icon" style="background:var(--yellow-bg);color:var(--yellow)">△</div>
+          出なかった・遅い
+        </button>
+      </div>
     </div>
   </div>
 </div>
