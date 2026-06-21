@@ -999,9 +999,55 @@ function renderCard() {
   const pct = playOrder.length > 1 ? (currentPos / (playOrder.length - 1)) * 100 : 100;
   document.getElementById('progress-bar').style.width = pct + '%';
   document.getElementById('flip-card').classList.remove('flipped');
+
+  if (settings.audioFirst) {
+    audioFirstStage = 0;
+    document.getElementById('af-placeholder').style.display = 'flex';
+    document.getElementById('card-ja').style.visibility = 'hidden';
+    document.getElementById('front-label').style.visibility = 'hidden';
+    document.getElementById('front-hint').textContent = 'タップで日本語を確認';
+    // 自動再生（ブロックされてもボタンで再再生できるのでフォールバック不要）
+    setTimeout(() => speak(), 120);
+  } else {
+    document.getElementById('af-placeholder').style.display = 'none';
+    document.getElementById('card-ja').style.visibility = 'visible';
+    document.getElementById('front-label').style.visibility = 'visible';
+    document.getElementById('front-hint').textContent = 'タップで英語を表示';
+  }
 }
 
-function flipCard() { document.getElementById('flip-card').classList.toggle('flipped'); }
+function flipCard() {
+  if (settings.audioFirst) {
+    if (audioFirstStage === 0) {
+      // 1回目タップ: 日本語を表示
+      audioFirstStage = 1;
+      document.getElementById('af-placeholder').style.display = 'none';
+      document.getElementById('card-ja').style.visibility = 'visible';
+      document.getElementById('front-label').style.visibility = 'visible';
+      document.getElementById('front-hint').textContent = 'タップで英語を表示';
+    } else if (audioFirstStage === 1) {
+      // 2回目タップ: 英語を表示（フリップ）
+      audioFirstStage = 2;
+      document.getElementById('flip-card').classList.add('flipped');
+    } else {
+      // 3回目タップ: 表に戻る
+      audioFirstStage = 0;
+      document.getElementById('flip-card').classList.remove('flipped');
+      document.getElementById('af-placeholder').style.display = 'flex';
+      document.getElementById('card-ja').style.visibility = 'hidden';
+      document.getElementById('front-label').style.visibility = 'hidden';
+      document.getElementById('front-hint').textContent = 'タップで日本語を確認';
+    }
+  } else {
+    document.getElementById('flip-card').classList.toggle('flipped');
+  }
+}
+
+function toggleAudioFirst() {
+  settings.audioFirst = document.getElementById('audio-first-toggle').checked;
+  localStorage.setItem('eng_settings', JSON.stringify(settings));
+  renderCard();
+}
 function prevCard() { if (!playOrder.length) return; currentPos = (currentPos - 1 + playOrder.length) % playOrder.length; renderCard(); }
 function nextCard() { if (!playOrder.length) return; currentPos = (currentPos + 1) % playOrder.length; renderCard(); }
 
