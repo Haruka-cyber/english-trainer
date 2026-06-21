@@ -1182,6 +1182,48 @@ function updateSpeedSecs() {
   document.getElementById('speed-secs-val').textContent = settings.speedSecs.toFixed(1);
   localStorage.setItem('eng_settings', JSON.stringify(settings));
 }
+
+function updateDefaultScripts() {
+  const storedOld = localStorage.getItem('eng_known_default_en');
+  const oldDefaultEn = storedOld ? new Set(JSON.parse(storedOld)) : LEGACY_DEFAULT_EN;
+
+  // 削除対象: 旧既定セットに含まれ、新既定セットにない
+  const toDelete = scripts.filter(s => oldDefaultEn.has(s.en) && !NEW_DEFAULT_EN.has(s.en));
+
+  if (toDelete.length > 0) {
+    const names = toDelete.map(s => `・${s.en}`).join('\n');
+    const ok = confirm(
+      `${toDelete.length}件のカードが新しいリストに含まれないため削除されます。\n\n${names}\n\n続けますか？`
+    );
+    if (!ok) return;
+  }
+
+  // 削除
+  scripts = scripts.filter(s => !(oldDefaultEn.has(s.en) && !NEW_DEFAULT_EN.has(s.en)));
+
+  // 既存カードのja/tagを新DEFAULT_SCRIPTSで更新（スコアは保持）
+  const byEn = new Map(scripts.map(s => [s.en, s]));
+  DEFAULT_SCRIPTS.forEach(d => {
+    if (byEn.has(d.en)) {
+      const s = byEn.get(d.en);
+      s.ja  = d.ja;
+      s.tag = d.tag;
+    } else {
+      scripts.push({ ...d, score: { ok:0, so:0, ng:0, lastReviewed:null, interval:24 } });
+    }
+  });
+
+  localStorage.setItem('eng_known_default_en', JSON.stringify([...NEW_DEFAULT_EN]));
+  persist();
+  buildPlayOrder();
+  renderTagBar('practice-tag-bar', practiceTag, setPracticeTag);
+  renderTagBar('list-tag-bar', listTag, setListTag);
+  renderCard();
+  if (document.getElementById('page-list').classList.contains('active')) renderList();
+
+  const added = DEFAULT_SCRIPTS.filter(d => !byEn.has(d.en)).length;
+  alert(`更新完了\n追加: ${added}件 / 削除: ${toDelete.length}件`);
+}
 function prevCard() { if (!playOrder.length) return; currentPos = (currentPos - 1 + playOrder.length) % playOrder.length; renderCard(); }
 function nextCard() { if (!playOrder.length) return; currentPos = (currentPos + 1) % playOrder.length; renderCard(); }
 
