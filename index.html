@@ -1251,6 +1251,7 @@ document.getElementById('rate').value  = settings.rate;
 document.getElementById('pitch').value = settings.pitch;
 document.getElementById('rate-val').textContent  = parseFloat(settings.rate).toFixed(1);
 document.getElementById('pitch-val').textContent = parseFloat(settings.pitch).toFixed(1);
+document.getElementById('audio-first-toggle').checked = !!settings.audioFirst;
 speechSynthesis.onvoiceschanged = populateVoices;
 populateVoices();
 document.getElementById('modal').addEventListener('click', e => { if (e.target===e.currentTarget) closeModal(); });
