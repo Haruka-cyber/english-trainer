@@ -695,6 +695,16 @@
       <label>音声</label>
       <select id="voice-select" onchange="saveSettings()"></select>
     </div>
+    <div class="setting-row">
+      <label style="display:flex;flex-direction:column;gap:3px">
+        <span>音声ファーストモード</span>
+        <span style="font-size:.72rem;color:var(--muted);font-weight:400">英語を聴いてから意味を確認</span>
+      </label>
+      <label class="toggle-switch">
+        <input type="checkbox" id="audio-first-toggle" onchange="toggleAudioFirst()">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
   </div>
   <div class="setting-section">
     <div class="setting-section-title">データ管理</div>
