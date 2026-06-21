@@ -1106,6 +1106,16 @@ function renderCard() {
 }
 
 function flipCard() {
+  if (settings.speedMode) {
+    const card = document.getElementById('flip-card');
+    if (!card.classList.contains('flipped')) {
+      clearSpeedTimer();
+      card.classList.add('flipped');
+      document.getElementById('speed-timer-wrap').style.display = 'none';
+      document.getElementById('speed-feedback-wrap').style.display = 'block';
+    }
+    return;
+  }
   if (settings.audioFirst) {
     if (audioFirstStage === 0) {
       // 1回目タップ: 日本語を表示
