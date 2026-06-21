@@ -617,9 +617,14 @@
     <div class="flip-card" id="flip-card" onclick="flipCard()">
       <div class="flip-inner">
         <div class="flip-front">
-          <div class="card-label">日本語</div>
+          <div class="card-label" id="front-label">日本語</div>
+          <div class="af-placeholder" id="af-placeholder">
+            <div class="af-pulse"></div>
+            <div class="af-sub">英語を聴いて<br>意味を思い出してください</div>
+            <div class="af-tap-hint">tap to reveal</div>
+          </div>
           <div class="card-text" id="card-ja"></div>
-          <div class="card-hint">タップで英語を表示</div>
+          <div class="card-hint" id="front-hint">タップで英語を表示</div>
         </div>
         <div class="flip-back">
           <div class="card-label">English</div>
