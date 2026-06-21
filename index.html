@@ -897,21 +897,24 @@ const LEGACY_DEFAULT_EN = new Set([
 ]);
 
 const savedVersion = parseInt(localStorage.getItem('eng_scripts_version') || '0');
+const NEW_DEFAULT_EN = new Set(DEFAULT_SCRIPTS.map(s => s.en));
 let scripts;
 if (savedVersion < SCRIPTS_VERSION) {
   scripts = DEFAULT_SCRIPTS.map(s => ({ ...s, score: { ok:0, so:0, ng:0, lastReviewed:null, interval:24 } }));
   localStorage.setItem('eng_scripts_version', SCRIPTS_VERSION);
+  localStorage.setItem('eng_known_default_en', JSON.stringify([...NEW_DEFAULT_EN]));
   persist();
 } else {
   scripts = JSON.parse(localStorage.getItem('eng_scripts') || 'null');
   if (scripts === null) {
     scripts = DEFAULT_SCRIPTS.map(s => ({ ...s, score: { ok:0, so:0, ng:0, lastReviewed:null, interval:24 } }));
+    localStorage.setItem('eng_known_default_en', JSON.stringify([...NEW_DEFAULT_EN]));
     persist();
   }
   scripts = scripts.map(s => ({
     ...s,
     score: { ok:0, so:0, ng:0, lastReviewed:null, interval:24, ...(s.score||{}) },
-    tag: s.tag || 'Web会議'
+    tag: s.tag || '接続・開始'
   }));
   const existingEn = new Set(scripts.map(s => s.en));
   DEFAULT_SCRIPTS.forEach(s => {
