@@ -1016,9 +1016,12 @@ function dominantResult(s) {
 
 function buildPlayOrder() {
   if (!scripts.length) { playOrder = []; return; }
-  const idx = scripts
+  let idx = scripts
     .map((_, i) => i)
     .filter(i => practiceTag === 'すべて' || scripts[i].tag === practiceTag);
+  if (settings.speedMode) {
+    idx = idx.filter(i => { const d = dominantResult(scripts[i]); return d === 'ok' || d === 'so'; });
+  }
   if (mode === 'seq') {
     playOrder = idx;
   } else if (mode === 'rand') {
