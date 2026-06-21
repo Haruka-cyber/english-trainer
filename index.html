@@ -1147,6 +1147,59 @@ function toggleAudioFirst() {
   localStorage.setItem('eng_settings', JSON.stringify(settings));
   renderCard();
 }
+
+function startSpeedTimer() {
+  const bar  = document.getElementById('speed-timer-bar');
+  const secs = parseFloat(settings.speedSecs);
+  bar.style.transition = 'none';
+  bar.style.width = '100%';
+  bar.getBoundingClientRect(); // reflow
+  bar.style.transition = `width ${secs}s linear`;
+  bar.style.width = '0%';
+  speedTimer = setTimeout(() => {
+    speedTimer = null;
+    document.getElementById('flip-card').classList.add('flipped');
+    document.getElementById('speed-timer-wrap').style.display = 'none';
+    document.getElementById('speed-feedback-wrap').style.display = 'block';
+  }, secs * 1000);
+}
+
+function clearSpeedTimer() {
+  if (speedTimer) { clearTimeout(speedTimer); speedTimer = null; }
+  const bar = document.getElementById('speed-timer-bar');
+  if (bar) { bar.style.transition = 'none'; bar.style.width = '100%'; }
+}
+
+function recordSpeedFeedback(fast) {
+  if (!playOrder.length) return;
+  const sc = scripts[playOrder[currentPos]].score;
+  sc.lastReviewed = Date.now();
+  if (fast) {
+    sc.ok++;
+    sc.interval = Math.min(sc.interval * 2.5, 720);
+  } else {
+    sc.so++;
+    sc.interval = Math.max(sc.interval * 0.5, 6);
+  }
+  persist();
+  const card = document.getElementById('flip-card');
+  card.style.transition = 'opacity .15s';
+  card.style.opacity = '0';
+  setTimeout(() => { card.style.opacity='1'; card.style.transition=''; nextCard(); }, 160);
+}
+
+function toggleSpeedMode() {
+  settings.speedMode = document.getElementById('speed-mode-toggle').checked;
+  localStorage.setItem('eng_settings', JSON.stringify(settings));
+  buildPlayOrder();
+  renderCard();
+}
+
+function updateSpeedSecs() {
+  settings.speedSecs = parseFloat(document.getElementById('speed-secs').value);
+  document.getElementById('speed-secs-val').textContent = settings.speedSecs.toFixed(1);
+  localStorage.setItem('eng_settings', JSON.stringify(settings));
+}
 function prevCard() { if (!playOrder.length) return; currentPos = (currentPos - 1 + playOrder.length) % playOrder.length; renderCard(); }
 function nextCard() { if (!playOrder.length) return; currentPos = (currentPos + 1) % playOrder.length; renderCard(); }
 
