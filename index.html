@@ -878,7 +878,8 @@ if (savedVersion < SCRIPTS_VERSION) {
   persist();
 }
 
-let settings = JSON.parse(localStorage.getItem('eng_settings') || '{"rate":1,"pitch":1,"voiceURI":""}');
+let settings = JSON.parse(localStorage.getItem('eng_settings') || '{"rate":1,"pitch":1,"voiceURI":"","audioFirst":false}');
+if (settings.audioFirst === undefined) settings.audioFirst = false;
 let mode = 'seq';
 let playOrder = [];
 let currentPos = 0;
@@ -886,6 +887,7 @@ let listFilter_current = 'all';
 let practiceTag = 'すべて';
 let listTag = 'すべて';
 let editingIdx = null;
+let audioFirstStage = 0; // 0:音声のみ 1:日本語表示 2:英語表示(flip済み)
 
 function getAllTags() {
   const tags = new Set(scripts.map(s => s.tag).filter(Boolean));
