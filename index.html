@@ -943,8 +943,10 @@ if (savedVersion < SCRIPTS_VERSION) {
   persist();
 }
 
-let settings = JSON.parse(localStorage.getItem('eng_settings') || '{"rate":1,"pitch":1,"voiceURI":"","audioFirst":false}');
-if (settings.audioFirst === undefined) settings.audioFirst = false;
+let settings = JSON.parse(localStorage.getItem('eng_settings') || '{"rate":1,"pitch":1,"voiceURI":"","audioFirst":false,"speedMode":false,"speedSecs":3}');
+if (settings.audioFirst  === undefined) settings.audioFirst  = false;
+if (settings.speedMode   === undefined) settings.speedMode   = false;
+if (settings.speedSecs   === undefined) settings.speedSecs   = 3;
 let mode = 'seq';
 let playOrder = [];
 let currentPos = 0;
@@ -952,7 +954,8 @@ let listFilter_current = 'all';
 let practiceTag = 'すべて';
 let listTag = 'すべて';
 let editingIdx = null;
-let audioFirstStage = 0; // 0:音声のみ 1:日本語表示 2:英語表示(flip済み)
+let audioFirstStage = 0;
+let speedTimer = null;
 
 function getAllTags() {
   const tags = new Set(scripts.map(s => s.tag).filter(Boolean));
