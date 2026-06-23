@@ -1250,7 +1250,7 @@ function recordFeedback(type) {
 }
 
 function extractEnglish(text) {
-  return text.replace(/[　-鿿豈-﫿＀-￯]+/g, ' ').replace(/\s+/g, ' ').trim();
+  return text.replace(/[　-鿿豈-﫿＀-￯]+/g, ' ').replace(/_+/g, ' ').replace(/\s+/g, ' ').trim();
 }
 function speak() {
   if (!playOrder.length) return;
