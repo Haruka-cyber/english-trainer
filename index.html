@@ -1324,9 +1324,13 @@ function renderList() {
     const hasScore = sc.ok + sc.so + sc.ng > 0;
     const dom = dominantResult(s);
     const barClass = { ok:'easy', so:'mid', ng:'hard', none:'none' }[dom];
-    const badges = hasScore
+    const fast = sc.fast||0, slow = sc.slow||0;
+    const speedBadges = (fast + slow > 0)
+      ? `<span class="score-badge fast">⚡ ${fast}</span><span class="score-badge slow">◷ ${slow}</span>`
+      : '';
+    const badges = (hasScore
       ? `<span class="score-badge ok">✓ ${sc.ok}</span><span class="score-badge so">△ ${sc.so}</span><span class="score-badge ng">✕ ${sc.ng}</span>`
-      : `<span class="score-badge none">未回答</span>`;
+      : `<span class="score-badge none">未回答</span>`) + speedBadges;
     return `
       <div class="script-item">
         <div class="script-item-top">
