@@ -1426,6 +1426,8 @@ async function manualSync() {
     s.score.ok = Math.max(s.score.ok, c.ok||0);
     s.score.so = Math.max(s.score.so, c.so||0);
     s.score.ng = Math.max(s.score.ng, c.ng||0);
+    s.score.fast = Math.max(s.score.fast||0, c.fast||0);
+    s.score.slow = Math.max(s.score.slow||0, c.slow||0);
     s.score.lastReviewed = Math.max(s.score.lastReviewed||0, c.lastReviewed||0) || null;
     s.score.interval = Math.max(s.score.interval||24, c.interval||24);
   });
