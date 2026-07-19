@@ -852,7 +852,6 @@ const DEFAULT_SCRIPTS = [
   { en: "I agree.", ja: "賛成です。", tag: "意見・賛否" },
   { en: "Good point.", ja: "いい点ですね。", tag: "意見・賛否" },
   { en: "I'm not so sure about that.", ja: "うーん、それはどうでしょう。（やんわり反対）", tag: "意見・賛否" },
-  { en: "Can we park that for now?", ja: "一旦それは保留にできますか？", tag: "意見・賛否" },
   // 質問・割り込み
   { en: "Can I jump in?", ja: "一つよろしいですか？（割り込み）", tag: "質問・割り込み" },
   { en: "I have a quick question.", ja: "短い質問があります。", tag: "質問・割り込み" },
@@ -900,18 +899,14 @@ const DEFAULT_SCRIPTS = [
   { en: "I'm looking forward to it.", ja: "楽しみにしています。", tag: "あいさつ・締め" },
   // 雑談
   { en: "How was your weekend?", ja: "週末はどうでしたか？", tag: "雑談" },
-  { en: "Rough start to the week?", ja: "週明けはしんどい感じですか？", tag: "雑談" },
   { en: "That meeting ran a little long, huh?", ja: "さっきの会議、少し長引きましたね。（run long＝予定より長引く）", tag: "雑談" },
   { en: "Not much, really.", ja: "特に何も。／大したことないです。（How are things?への返し）", tag: "雑談" },
   { en: "How are you doing?", ja: "調子はどうですか？", tag: "雑談" },
   // 言い換え・確認
   { en: "Sure — I mean, ___.", ja: "つまり、___という意味です。（伝わらなかった時の言い換え）", tag: "言い換え・確認" },
   { en: "Let me ask it a different way.", ja: "別の聞き方をしますね。", tag: "言い換え・確認" },
-  { en: "Let's pick up where we left off.", ja: "前回の続きから始めましょう。", tag: "言い換え・確認" },
-  { en: "Can you walk me through ___?", ja: "___について順を追って説明してもらえますか？", tag: "言い換え・確認" },
   { en: "If I remember correctly, ___.", ja: "確か___だったと思います。（断定を避ける言い方）", tag: "言い換え・確認" },
   { en: "So you're saying ___?", ja: "つまり___ということですね？（相手の発言を確認）", tag: "言い換え・確認" },
-  { en: "Before we get into the details, ___.", ja: "詳細に入る前に、___。", tag: "言い換え・確認" },
   { en: "What would this run us?", ja: "これは費用がどのくらいかかりますか？", tag: "言い換え・確認" },
   // やわらかい表現
   { en: "I don't see any major risks right now.", ja: "今のところ大きなリスクは見当たりません。（断定を避ける言い方）", tag: "やわらかい表現" },
@@ -922,6 +917,7 @@ const DEFAULT_SCRIPTS = [
   { en: "Please wait a moment while I find the document.", ja: "資料を探しますので、少々お待ちください。", tag: "依頼・お願い" },
   { en: "Does anyone know someone familiar with this?", ja: "これに詳しい方をどなたかご存じですか？", tag: "依頼・お願い" },
   { en: "Could you introduce me?", ja: "ご紹介いただけますか？", tag: "依頼・お願い" },
+  { en: "I'd appreciate it if you could ___.", ja: "___していただけると助かります。", tag: "依頼・お願い" },
 ];
 
 // 旧DEFAULT_SCRIPTSのenセット（「既定スクリプトを更新」で削除対象を判別するために使用）
