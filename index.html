@@ -1376,6 +1376,7 @@ function renderList() {
             ${s.tag ? `<div style="margin-top:4px"><span class="tag-badge">${esc(s.tag)}</span></div>` : ''}
           </div>
           <div class="item-actions">
+            <button class="icon-btn" onclick="copyOne(${i})" title="英文をコピー">コ</button>
             <button class="icon-btn" onclick="openModal(${i})">編</button>
             <button class="icon-btn del" onclick="deleteScript(${i})">削</button>
           </div>
