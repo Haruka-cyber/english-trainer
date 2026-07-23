@@ -1344,12 +1344,7 @@ function renderList() {
     el.innerHTML = '<div class="empty"><div class="empty-icon">—</div><p>まだスクリプトがありません</p></div>';
     return;
   }
-  const filtered = scripts.map((s, i) => ({ s, i })).filter(({ s }) => {
-    if (listTag !== 'すべて' && s.tag !== listTag) return false;
-    if (listFilter_current === 'all')  return true;
-    if (listFilter_current === 'none') return dominantResult(s) === 'none';
-    return dominantResult(s) === listFilter_current;
-  });
+  const filtered = getFilteredScripts();
   if (!filtered.length) {
     el.innerHTML = '<div class="empty"><div class="empty-icon">—</div><p>該当するスクリプトがありません</p></div>';
     return;
