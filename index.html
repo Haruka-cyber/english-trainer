@@ -1388,6 +1388,56 @@ function renderList() {
 
 function esc(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+function getFilteredScripts() {
+  return scripts.map((s, i) => ({ s, i })).filter(({ s }) => {
+    if (listTag !== 'すべて' && s.tag !== listTag) return false;
+    if (listFilter_current === 'all')  return true;
+    if (listFilter_current === 'none') return dominantResult(s) === 'none';
+    return dominantResult(s) === listFilter_current;
+  });
+}
+
+async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (e) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e2) {}
+    document.body.removeChild(ta);
+    return ok;
+  }
+}
+
+function flashCopied(msg) {
+  const el = document.createElement('div');
+  el.textContent = msg || 'コピーしました';
+  el.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--accent2);color:#fff;padding:8px 18px;border-radius:20px;font-size:.8rem;font-weight:700;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.3);';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1600);
+}
+
+async function copyOne(idx) {
+  const s = scripts[idx];
+  if (!s) return;
+  const ok = await copyToClipboard(s.en);
+  flashCopied(ok ? 'コピーしました' : 'コピーに失敗しました');
+}
+
+async function copyFilteredList() {
+  const filtered = getFilteredScripts();
+  if (!filtered.length) { flashCopied('対象がありません'); return; }
+  const text = filtered.map(({ s }) => s.en).join('\n');
+  const ok = await copyToClipboard(text);
+  flashCopied(ok ? `${filtered.length}件をコピーしました` : 'コピーに失敗しました');
+}
+
 function openModal(idx=null) {
   editingIdx = idx;
   document.getElementById('modal-title').textContent = idx===null ? 'スクリプトを追加' : 'スクリプトを編集';
