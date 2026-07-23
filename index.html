@@ -712,7 +712,10 @@
 <div class="page" id="page-list">
   <div class="list-header">
     <span class="list-title">Scripts</span>
-    <button class="add-btn" onclick="openModal()">+ 追加</button>
+    <div style="display:flex;gap:6px">
+      <button class="icon-btn" style="width:auto;padding:0 12px" onclick="copyFilteredList()" title="表示中の英文をまとめてコピー">コピー</button>
+      <button class="add-btn" onclick="openModal()">+ 追加</button>
+    </div>
   </div>
   <div class="tag-filter-bar" id="list-tag-bar"></div>
   <div class="list-filter">
