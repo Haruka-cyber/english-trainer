@@ -1551,6 +1551,20 @@ function setSyncStatus(msg, color) {
   el.style.color = color || 'rgba(255,255,255,.5)';
 }
 
+// 前回同期でクラウドに書き込んだ値のスナップショット（差分計算の基準点）。
+// max方式だと「別端末や別タイミングの同期でクラウドの方がすでに大きい」場合、
+// 今回ローカルで新しく増えた回答分がそのまま握りつぶされてしまう（増やしたのに
+// 反映されない）という欠陥があったため、差分加算方式にする。
+// あるフレーズについてスナップショットが無い場合（初回同期・新規追加フレーズ）は、
+// 基準点をクラウドの現在値にフォールバックする＝ Math.max(0, local - cloud) となり、
+// 旧方式と同じ安全な挙動になる（ここを0にすると二重計上になるので注意）。
+function getSyncSnapshot() {
+  return JSON.parse(localStorage.getItem('eng_sync_snapshot') || '{}');
+}
+function setSyncSnapshot(snap) {
+  localStorage.setItem('eng_sync_snapshot', JSON.stringify(snap));
+}
+
 async function manualSync() {
   const btn = document.getElementById('sync-btn');
   btn.disabled = true;
@@ -1567,17 +1581,23 @@ async function manualSync() {
     return;
   }
 
-  // 2. ローカルとクラウドをマージ（両デバイスの記録を合算）
+  // 2. ローカルとクラウドをマージ
+  //    ok/so/ng/fast/slow は「前回同期からのローカル差分」をクラウド値に加算する。
+  //    lastReviewed/interval は単純に新しい方（max）を採用する。
+  const snapshot = getSyncSnapshot();
   scripts.forEach(s => {
-    const c = cloudData[s.en];
-    if (!c) return;
-    s.score.ok = Math.max(s.score.ok, c.ok||0);
-    s.score.so = Math.max(s.score.so, c.so||0);
-    s.score.ng = Math.max(s.score.ng, c.ng||0);
-    s.score.fast = Math.max(s.score.fast||0, c.fast||0);
-    s.score.slow = Math.max(s.score.slow||0, c.slow||0);
-    s.score.lastReviewed = Math.max(s.score.lastReviewed||0, c.lastReviewed||0) || null;
-    s.score.interval = Math.max(s.score.interval||24, c.interval||24);
+    const c = cloudData[s.en] || {};
+    const prev = snapshot[s.en] || c; // フレーズ単位でフォールバック（新規追加フレーズにも対応）
+    const merged = { ...s.score };
+    ['ok','so','ng','fast','slow'].forEach(key => {
+      const localVal = s.score[key] || 0;
+      const prevVal = prev[key] || 0;
+      const delta = Math.max(0, localVal - prevVal); // 前回同期以降にローカルで増えた分
+      merged[key] = (c[key] || 0) + delta;
+    });
+    merged.lastReviewed = Math.max(s.score.lastReviewed||0, c.lastReviewed||0) || null;
+    merged.interval = Math.max(s.score.interval||24, c.interval||24);
+    s.score = merged;
   });
   persist();
 
@@ -1587,6 +1607,8 @@ async function manualSync() {
     const payload = {};
     scripts.forEach(s => { payload[s.en] = s.score; });
     await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
+    // 保存成功時のみスナップショットを更新（次回同期の基準点にする）
+    setSyncSnapshot(payload);
     renderCard();
     if (document.getElementById('page-list').classList.contains('active')) renderList();
     setSyncStatus('完了', '#34d399');
