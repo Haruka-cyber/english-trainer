@@ -1582,9 +1582,13 @@ async function manualSync() {
   //    加算する（他端末の記録を上書きせず、自分の新しい回答分だけ確実に反映するため）。
   //    lastReviewed/interval は単純に新しい方（max）を採用する。
   const snapshot = getSyncSnapshot();
+  const hasSnapshot = Object.keys(snapshot).length > 0;
   scripts.forEach(s => {
     const c = cloudData[s.en] || {};
-    const prev = snapshot[s.en] || {};
+    // スナップショットが（初回同期などで）存在しない場合、基準点は0ではなくクラウドの
+    // 現在値にする。0を基準にすると「ローカルの全カウント」がまるごと差分とみなされ、
+    // クラウド値に加算されて二重計上になってしまうため。
+    const prev = snapshot[s.en] || (hasSnapshot ? {} : c);
     const merged = { ...s.score };
     ['ok','so','ng','fast','slow'].forEach(key => {
       const localVal = s.score[key] || 0;
