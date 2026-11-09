@@ -836,6 +836,7 @@ const DEFAULT_SCRIPTS = [
   { en: "Can you hear me okay?", ja: "聞こえていますか？", tag: "接続・開始" },
   { en: "Sorry, you're on mute.", ja: "すみません、ミュートになっています。", tag: "接続・開始" },
   { en: "Let me share my screen.", ja: "画面を共有します。", tag: "接続・開始" },
+  { en: "Actually, I'm calling about ___.", ja: "実は、___の件でお電話しました。（用件の切り出し。Honestlyではなく Actually）", tag: "接続・開始" },
   // 聞き取れない・確認
   { en: "Sorry, could you repeat that?", ja: "すみません、もう一度お願いします。", tag: "聞き取れない・確認" },
   { en: "Could you slow down a little?", ja: "少しゆっくりお願いできますか？", tag: "聞き取れない・確認" },
@@ -846,6 +847,8 @@ const DEFAULT_SCRIPTS = [
   { en: "Thank you, that's clear now.", ja: "ありがとうございます、よく分かりました。", tag: "聞き取れない・確認" },
   { en: "Sorry, I didn't catch what you said.", ja: "すみません、今おっしゃったことが聞き取れませんでした。", tag: "聞き取れない・確認" },
   { en: "I haven't heard about that. Could you tell me more?", ja: "それは知りませんでした。詳しく教えていただけますか？", tag: "聞き取れない・確認" },
+  { en: "What does \"___\" mean?", ja: "「___」ってどういう意味ですか？（単語の意味を聞く。does を忘れずに）", tag: "聞き取れない・確認" },
+  { en: "Not exactly. What I meant was ___.", ja: "少し違います。言いたかったのは___です。（相手の確認がずれていた時）", tag: "聞き取れない・確認" },
   // 時間を稼ぐ
   { en: "That's a good question.", ja: "いい質問ですね。", tag: "時間を稼ぐ" },
   { en: "That's a tough question. It's just a gut feeling.", ja: "難しい質問ですね。ただの勘です。（gut feeling＝直感）", tag: "時間を稼ぐ" },
@@ -861,6 +864,8 @@ const DEFAULT_SCRIPTS = [
   // 質問・割り込み
   { en: "Can I jump in?", ja: "一つよろしいですか？（割り込み）", tag: "質問・割り込み" },
   { en: "I have a quick question.", ja: "短い質問があります。", tag: "質問・割り込み" },
+  { en: "How long do you think it would take?", ja: "どのくらいかかると思いますか？（期間を聞く。do you think を入れる）", tag: "質問・割り込み" },
+  { en: "Could you help me understand why ___?", ja: "なぜ___なのか教えていただけますか？（Why do we ~? より柔らかい）", tag: "質問・割り込み" },
   // 相づち
   { en: "I see.", ja: "なるほど。", tag: "相づち" },
   { en: "Right.", ja: "ですよね。", tag: "相づち" },
@@ -879,6 +884,8 @@ const DEFAULT_SCRIPTS = [
   { en: "I can help with that.", ja: "それ、お手伝いできます。", tag: "引き受け・対応" },
   { en: "I'm not sure.", ja: "わかりません。（正直に）", tag: "引き受け・対応" },
   { en: "I don't have that info right now.", ja: "今その情報は持っていません。", tag: "引き受け・対応" },
+  { en: "It'll be ready by then.", ja: "それまでには準備できます。（ready は形容詞なので be が必要）", tag: "引き受け・対応" },
+  { en: "It won't be ready in time.", ja: "間に合いそうにありません。（in time＝期限に間に合って）", tag: "引き受け・対応" },
   // 進行・まとめ
   { en: "Let's move on to the next point.", ja: "次の点に移りましょう。", tag: "進行・まとめ" },
   { en: "Can we take this offline?", ja: "これは後で別途話しませんか？", tag: "進行・まとめ" },
@@ -930,6 +937,9 @@ const DEFAULT_SCRIPTS = [
   { en: "Are you currently working on an AI-related project?", ja: "今、AI関連のプロジェクトに携わっていますか？", tag: "自己紹介・AI" },
   { en: "I'm actually working on an AI project right now.", ja: "実は今、AIのプロジェクトに携わっています。", tag: "自己紹介・AI" },
   { en: "It's about the latest physical AI and robots.", ja: "最新のフィジカルAIとロボットに関するものです。", tag: "自己紹介・AI" },
+  { en: "I've been with the company for ___ years.", ja: "この会社に___年います。（with＝所属している）", tag: "自己紹介・AI" },
+  { en: "It can handle ___.", ja: "___に対応できます。（例：It can handle customer inquiries. can の後に動詞）", tag: "自己紹介・AI" },
+  { en: "We want to see if ___ works for ___.", ja: "___が___に合うか確かめたいです。（see if＝〜かどうか確かめる）", tag: "自己紹介・AI" },
   // 確認・相づち
   { en: "Could you tell me more about that?", ja: "詳しく教えていただけますか。", tag: "聞き取れない・確認" },
   { en: "I think you're right.", ja: "おっしゃる通りだと思います。", tag: "意見・賛否" },
@@ -975,6 +985,11 @@ const DEFAULT_SCRIPTS = [
   { en: "This will be my first time doing this.", ja: "これをするのは初めてです。（中程度）", tag: "雑談" },
   { en: "I've done it once before, so I have some idea.", ja: "前に一度やったことがあるので、多少分かります。（中程度）", tag: "雑談" },
   { en: "I don't think we've met before.", ja: "お会いしたことはないと思います。（中程度〜フォーマル。初対面）", tag: "雑談" },
+  { en: "Not at all. Go ahead.", ja: "全然かまいません、どうぞ。（Do you mind ~? への返事。Yes だと「嫌です」になる）", tag: "雑談" },
+  { en: "We've been busy preparing for ___.", ja: "最近ずっと___の準備で忙しいです。（prepare for。現在完了進行形）", tag: "雑談" },
+  { en: "It's moving faster than I expected.", ja: "思っていたより早く進んでいます。（比較級＋than I expected）", tag: "雑談" },
+  { en: "I wonder where ___.", ja: "___はどこだろう。（I wonder if ___＝〜かな、にも応用可）", tag: "雑談" },
+  { en: "It's a shame ___.", ja: "___なのは残念ですね。（良いけど一部残念、を伝える）", tag: "雑談" },
   // 言い換え・確認
   { en: "Let me ask it a different way.", ja: "別の聞き方をしますね。", tag: "言い換え・確認" },
   { en: "If I remember correctly, ___.", ja: "確か___だったと思います。（断定を避ける言い方）", tag: "言い換え・確認" },
@@ -996,6 +1011,8 @@ const DEFAULT_SCRIPTS = [
   { en: "Which department handles this?", ja: "どの部署が担当ですか？（handle＝担当する）", tag: "依頼・お願い" },
   { en: "Could you introduce me?", ja: "ご紹介いただけますか？", tag: "依頼・お願い" },
   { en: "I'd appreciate it if you could ___.", ja: "___していただけると助かります。", tag: "依頼・お願い" },
+  { en: "Would it be possible to move ___ to next week?", ja: "___を来週に変更していただくことは可能でしょうか？（next week に the は付けない）", tag: "依頼・お願い" },
+  { en: "Would ___ be possible?", ja: "___は可能でしょうか？（妥協案を出す時。例：Would four months be possible?）", tag: "依頼・お願い" },
 ];
 
 // 旧DEFAULT_SCRIPTSのenセット（「既定スクリプトを更新」で削除対象を判別するために使用）
